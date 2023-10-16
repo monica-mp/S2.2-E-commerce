@@ -132,6 +132,9 @@ function printCart() {
         cartList += '<td>' + item.quantity + '</td>';
         cartList += '<td>$' + item.subtotalWithDiscount.toFixed(2) + '</td>';
         cartList += '<td>';
+        cartList += '<button type="button" onclick="removeFromCart(' + item.id + ')" class="btn btn-outline-secondary btn-sm">Remove 1</button>';
+        cartList += '</td>';
+        cartList += '</tr>';
         
     });
     cartModal.innerHTML = cartList;
@@ -151,7 +154,21 @@ function printCart() {
 
 // Exercise 7
 function removeFromCart(id) {
+    const indexProduct = cart.findIndex(item => item.id === id);
 
+    if(indexProduct !== -1){
+        const product = cart[indexProduct];
+
+        if(product.quantity > 1){
+            product.quantity--;
+        }else{
+            cart.splice(indexProduct, 1);
+        }
+
+        applyPromotionsCart();
+        calculateTotal();
+        printCart();
+    }
 }
 
 function open_modal() {
