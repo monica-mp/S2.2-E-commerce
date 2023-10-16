@@ -8,7 +8,8 @@ var products = [
         offer: {
             number: 3,
             percent: 20
-        }
+        },
+        subtotalWithDiscount: 0
     },
     {
         id: 2,
@@ -24,7 +25,8 @@ var products = [
         offer: {
             number: 10,
             percent: 30
-        }
+        },
+        subtotalWithDiscount: 0
     },
     {
         id: 4,
@@ -46,19 +48,19 @@ var products = [
     },
     {
         id: 7,
-        name: 'Lawn Dress',
+        name: 'Wedding dress',
         price: 15,
         type: 'clothes'
     },
     {
         id: 8,
-        name: 'Lawn-Chiffon Combo',
+        name: 'Boots',
         price: 19.99,
         type: 'clothes'
     },
     {
         id: 9,
-        name: 'Toddler Frock',
+        name: 'Cap',
         price: 9.99,
         type: 'clothes'
     }
@@ -76,29 +78,73 @@ var total = 0;
 
 // Exercise 1
 function buy(id) {
-    // 1. Loop for to the array products to get the item to add to cart
-    // 2. Add found product to the cart array
+    let producte = products.find(item => item.id === id);    
+    let producteAfegit = cart.find(product => product.id === id);
+
+    if(producteAfegit){
+        producteAfegit.quantity += 1;
+    }else{
+        cart.push({...producte, quantity: 1});
+    }        
+    applyPromotionsCart()
+    calculateTotal(); 
+    printCart();
 }
 
 // Exercise 2
 function cleanCart() {
-
+    cart.splice(0, cart.length);    
+    total = 0;
+    printCart();
 }
 
 // Exercise 3
 function calculateTotal() {
-    // Calculate total price of the cart using the "cartList" array
+    total = 0;
+    for(let item of cart){
+        total += item.subtotalWithDiscount;
+    }
+    return total;
 }
 
 // Exercise 4
-function applyPromotionsCart() {
-    // Apply promotions to each item in the array "cart"
+function applyPromotionsCart() {    
+    for(let item of cart){
+        if(item.offer && item.quantity >= item.offer.number){
+            let descompte = item.price * (1 - item.offer.percent/100);
+            item.subtotalWithDiscount = item.quantity * descompte;
+        } else{
+            item.subtotalWithDiscount = item.price * item.quantity;
+        }
+        total += item.subtotalWithDiscount;
+    }      
 }
 
 // Exercise 5
 function printCart() {
-    // Fill the shopping cart modal manipulating the shopping cart dom
+    let cartModal = document.getElementById("cart_list");
+    let cartList = "";    
+
+    cart.forEach((item) => {
+        cartList += '<tr>';
+        cartList += '<th scope="row">' + item.name + '</th>';
+        cartList += '<td>$' + item.price.toFixed(2) + '</td>';
+        cartList += '<td>' + item.quantity + '</td>';
+        cartList += '<td>$' + item.subtotalWithDiscount.toFixed(2) + '</td>';
+        cartList += '<td>';
+        
+    });
+    cartModal.innerHTML = cartList;
+
+    let cartTotal = document.getElementById("total_price");
+    cartTotal.innerHTML = total.toFixed(2); 
+    
+    //Actualitzar comptador productes al navbar
+    let count = document.getElementById("count_product");
+    let countCart = cart.reduce((total, item) => total + item.quantity, 0);
+    count.innerHTML = countCart;   
 }
+
 
 
 // ** Nivell II **
